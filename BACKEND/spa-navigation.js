@@ -51,13 +51,15 @@ function initializeEventListeners() {
     document.addEventListener('click', (e) => {
         const menuBtn = e.target.closest('.mobile-menu-toggle');
         if (menuBtn) {
-            e.stopPropagation();
-            const nav = menuBtn.nextElementSibling;
-            if (nav && nav.classList.contains('nav')) {
+            e.stopImmediatePropagation();
+            const nav = document.querySelector('.nav');
+            if (nav) {
                 nav.classList.toggle('active');
+                console.log('Menu toggled, active:', nav.classList.contains('active'));
             }
+            return;
         }
-    });
+    }, true); // Use capture phase to run first
 
     // Close menu when clicking outside
     document.addEventListener('click', (e) => {

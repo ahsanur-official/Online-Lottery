@@ -57,3 +57,18 @@
         transform: translateY(0);
     }
 }
+
+/* Mobile Menu Support */
+@media (max-width: 768px) {
+    .mobile-menu-toggle {
+        display: block !important;
+    }
+    
+    .nav {
+        display: none !important;
+    }
+    
+    .nav.active {
+        display: block !important;
+    }
+}
