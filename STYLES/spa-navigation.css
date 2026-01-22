@@ -44,19 +44,7 @@
     display: block;
 }
 
-/* Mobile Menu Active State */
-.nav.active {
-    display: flex !important;
-    flex-direction: column;
-    position: absolute;
-    top: 100%;
-    left: 0;
-    right: 0;
-    background: var(--bg-secondary);
-    border-radius: 0 0 10px 10px;
-    padding: 20px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-}
+
 
 /* Fade In Animation */
 @keyframes fadeIn {

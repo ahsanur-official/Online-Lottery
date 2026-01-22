@@ -72,6 +72,7 @@ function initializeEventListeners() {
         if (link) {
             e.preventDefault();
             navigatePage(link.dataset.page);
+            closeAllMenus();
         }
     });
 
