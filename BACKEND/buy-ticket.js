@@ -1,79 +1,95 @@
 // =============================================
-// BUY TICKET PAGE FUNCTIONALITY - BANGLADESH LOTTERY
+// BUY TICKET PAGE FUNCTIONALITY
 // =============================================
 
 const TICKET_PRICE = 1; // 1 BDT per ticket
-const MAX_TICKETS = 100; // Can buy up to 100 tickets at once
-const DRAW_DAY = 5; // Friday (0=Sunday, 5=Friday)
-const DRAW_TIME = '20:00'; // 8 PM
-const PURCHASE_START = 10; // Saturday 10 AM
-const PURCHASE_END = 18; // Friday 6 PM
-
 let selectedLottery = null;
 let ticketQuantity = 1;
 
-// Prize tiers: 7 prizes total
-const PRIZE_TIERS = [
-    { position: 1, amount: 10000, count: 1 },
-    { position: 2, amount: 5000, count: 1 },
-    { position: 3, amount: 1000, count: 5 }
-];
-
-// Payment methods (Bangladesh)
-const PAYMENT_METHODS = [
-    { id: 'bkash', name: 'bKash', icon: '📱' },
-    { id: 'nagad', name: 'Nagad', icon: '📲' },
-    { id: 'rocket', name: 'Rocket', icon: '🚀' }
-];
-
 document.addEventListener('DOMContentLoaded', function() {
     initializeBuyTicketPage();
-    setupEventListeners();
-    updatePaymentMethods();
-    checkPurchaseAvailability();
+    setupBuyTicketEventListeners();
 });
 
 function initializeBuyTicketPage() {
     const user = getCurrentUser();
-    if (!user) {
-        window.location.href = 'login.html';
-        return;
-    }
-    
-    // Initialize with default lottery
+    if (!user) return;
+
+    // Initialize payment methods
+    initializePaymentMethods();
+
+    // Initialize with first lottery by default
     const firstCard = document.querySelector('.lottery-type-card');
     if (firstCard) {
-        selectLottery(firstCard);
+        selectLotteryCard(firstCard);
     }
 }
 
-function setupEventListeners() {
-    // Lottery type selection
-    const lotteryCards = document.querySelectorAll('.lottery-type-card');
-    lotteryCards.forEach(card => {
-        card.addEventListener('click', function(e) {
-            e.preventDefault();
-            selectLottery(this);
+function initializePaymentMethods() {
+    const paymentContainer = document.querySelector('.payment-options');
+    if (!paymentContainer) return;
+
+    const paymentMethods = [
+        { id: 'bkash', name: '📱 bKash', description: 'Mobile Wallet' },
+        { id: 'nagad', name: '📞 Nagad', description: 'Mobile Wallet' },
+        { id: 'rocket', name: '🚀 Rocket', description: 'Mobile Wallet' },
+        { id: 'card', name: '💳 Debit Card', description: 'Visa/MasterCard' },
+        { id: 'bank', name: '🏦 Bank Transfer', description: 'Direct Transfer' }
+    ];
+
+    paymentContainer.innerHTML = paymentMethods
+        .map(
+            (method) => `
+        <label class="payment-option" style="display: flex; align-items: center; padding: 12px; margin: 8px 0; border: 2px solid #ddd; border-radius: 8px; cursor: pointer; transition: all 0.3s ease;">
+            <input type="radio" name="payment-method" value="${method.id}" style="margin-right: 12px; cursor: pointer;" />
+            <div>
+                <div style="font-weight: 600; font-size: 0.95rem;">${method.name}</div>
+                <div style="font-size: 0.85rem; color: var(--text-secondary);">${method.description}</div>
+            </div>
+        </label>
+    `
+        )
+        .join('');
+
+    // Add styling to payment labels
+    document.querySelectorAll('.payment-option').forEach((label) => {
+        label.addEventListener('change', function() {
+            document.querySelectorAll('.payment-option').forEach(l => {
+                l.style.borderColor = '#ddd';
+                l.style.backgroundColor = 'transparent';
+            });
+            this.style.borderColor = 'var(--primary-color)';
+            this.style.backgroundColor = 'rgba(102, 126, 234, 0.1)';
         });
     });
-    
+}
+
+function setupBuyTicketEventListeners() {
+    // Lottery selection
+    const lotteryCards = document.querySelectorAll('.lottery-type-card');
+    lotteryCards.forEach((card) => {
+        card.addEventListener('click', function () {
+            selectLotteryCard(this);
+        });
+    });
+
     // Quantity controls
     const qtyIncrease = document.getElementById('qty-increase');
     const qtyDecrease = document.getElementById('qty-decrease');
     const qtyInput = document.getElementById('ticket-quantity');
-    
+
     if (qtyIncrease) {
-        qtyIncrease.addEventListener('click', () => {
-            if (ticketQuantity < MAX_TICKETS) {
+        qtyIncrease.addEventListener('click', function () {
+            if (ticketQuantity < 100) {
                 ticketQuantity++;
                 if (qtyInput) qtyInput.value = ticketQuantity;
                 updateOrderSummary();
             }
         });
     }
-    
+
     if (qtyDecrease) {
-        qtyDecrease.addEventListener('click', () => {
+        qtyDecrease.addEventListener('click', function () {
             if (ticketQuantity > 1) {
                 ticketQuantity--;
                 if (qtyInput) qtyInput.value = ticketQuantity;
@@ -81,24 +97,18 @@ function setupEventListeners() {
             }
         });
     }
-    
+
     if (qtyInput) {
-        qtyInput.addEventListener('change', () => {
-            let value = parseInt(qtyInput.value) || 1;
-            if (value > MAX_TICKETS) value = MAX_TICKETS;
+        qtyInput.addEventListener('change', function () {
+            let value = parseInt(this.value) || 1;
             if (value < 1) value = 1;
+            if (value > 100) value = 100;
             ticketQuantity = value;
-            qtyInput.value = ticketQuantity;
+            this.value = ticketQuantity;
             updateOrderSummary();
         });
     }
-    
-    // Payment method selection
-    const paymentOptions = document.querySelectorAll('.payment-option input');
-    paymentOptions.forEach(option => {
-        option.addEventListener('change', updateOrderSummary);
-    });
-    
+
     // Purchase button
     const purchaseBtn = document.getElementById('purchase-btn');
     if (purchaseBtn) {
@@ -106,307 +116,229 @@ function setupEventListeners() {
     }
 }
 
-function updatePaymentMethods() {
-    const paymentOptionsDiv = document.querySelector('.payment-options');
-    if (!paymentOptionsDiv) return;
-    
-    paymentOptionsDiv.innerHTML = '';
-    PAYMENT_METHODS.forEach((method, index) => {
-        const label = document.createElement('label');
-        label.className = 'payment-option';
-        label.innerHTML = `
-            <input type="radio" name="payment-method" value="${method.id}" ${index === 0 ? 'checked' : ''}>
-            <span>${method.icon} ${method.name}</span>
-        `;
-        paymentOptionsDiv.appendChild(label);
+function selectLotteryCard(card) {
+    // Remove selection from all cards
+    document.querySelectorAll('.lottery-type-card').forEach((c) => {
+        c.style.borderColor = 'transparent';
+        c.style.backgroundColor = 'transparent';
     });
-}
 
-function selectLottery(card) {
-    // Remove previous selection
-    document.querySelectorAll('.lottery-type-card').forEach(c => {
-        c.classList.remove('selected');
-    });
-    
     // Add selection to current card
-    card.classList.add('selected');
-    
+    card.style.borderColor = 'var(--primary-color)';
+    card.style.backgroundColor = 'var(--primary-gradient)';
+    card.style.color = 'white';
+
     // Extract lottery info
     selectedLottery = {
-        type: card.getAttribute('data-type'),
-        name: card.querySelector('.lottery-title')?.textContent || card.querySelector('h3')?.textContent || 'Lottery',
-        prize: card.querySelector('.lottery-prize')?.textContent || '$1,000,000',
-        date: getNextDrawDate(),
-        icon: card.querySelector('.lottery-icon')?.textContent || '🎰'
+        type: card.textContent,
+        name: card.querySelector('h3') ? card.querySelector('h3').textContent : 'Lottery',
+        date: 'Next Friday 8 PM'
     };
-    
+
     // Show quantity selector
     const quantitySection = document.getElementById('ticket-quantity-section');
     if (quantitySection) {
         quantitySection.style.display = 'block';
     }
-    
-    updateOrderSummary();
-}
 
-function getNextDrawDate() {
-    const now = new Date();
-    const currentDay = now.getDay();
-    let daysUntilFriday;
-    
-    if (currentDay <= DRAW_DAY) {
-        daysUntilFriday = DRAW_DAY - currentDay;
-    } else {
-        daysUntilFriday = 7 - currentDay + DRAW_DAY;
-    }
-    
-    if (daysUntilFriday === 0) {
-        const drawTime = new Date();
-        drawTime.setHours(20, 0, 0, 0);
-        if (now > drawTime) {
-            daysUntilFriday = 7;
-        }
-    }
-    
-    const drawDate = new Date(now);
-    drawDate.setDate(drawDate.getDate() + daysUntilFriday);
-    drawDate.setHours(20, 0, 0, 0);
-    
-    return drawDate.toLocaleDateString('en-US', { 
-        month: 'short', 
-        day: 'numeric',
-        year: 'numeric'
-    }) + ' at 8 PM';
+    ticketQuantity = 1;
+    updateOrderSummary();
 }
 
 function updateOrderSummary() {
     if (!selectedLottery) {
-        alert('Please select a lottery first');
+        const summaryDiv = document.querySelector('.order-summary-items');
+        if (summaryDiv) {
+            summaryDiv.innerHTML = '<div class="summary-row"><span>Select a lottery to begin</span></div>';
+        }
         return;
     }
-    
+
     const totalPrice = TICKET_PRICE * ticketQuantity;
     const summaryDiv = document.querySelector('.order-summary-items');
-    
+
     if (summaryDiv) {
         summaryDiv.innerHTML = `
             <div class="summary-row">
-                <span>Lottery:</span>
+                <span>Lottery Game:</span>
                 <strong>${selectedLottery.name}</strong>
-            </div>
-            <div class="summary-row">
-                <span>Tickets:</span>
-                <strong>${ticketQuantity} × ${TICKET_PRICE} BDT</strong>
-            </div>
-            <div class="summary-row">
-                <span>Prize Pool:</span>
-                <strong>${selectedLottery.prize}</strong>
             </div>
             <div class="summary-row">
                 <span>Draw Date:</span>
                 <strong>${selectedLottery.date}</strong>
             </div>
-            <hr style="margin: 15px 0; border: 1px solid var(--primary-color);">
-            <div class="summary-row" style="font-size: 1.2rem; font-weight: 700;">
-                <span>Total Price:</span>
-                <strong>${totalPrice} BDT</strong>
+            <div class="summary-row">
+                <span>Unit Price:</span>
+                <strong>${TICKET_PRICE} BDT</strong>
+            </div>
+            <div class="summary-row">
+                <span>Quantity:</span>
+                <strong>${ticketQuantity} Ticket${ticketQuantity > 1 ? 's' : ''}</strong>
+            </div>
+            <div class="summary-row" style="border-top: 2px solid var(--primary-color); padding-top: 10px; margin-top: 10px; font-weight: 600; font-size: 1.1rem;">
+                <span>Total Amount:</span>
+                <strong style="color: var(--primary-color);">${totalPrice} BDT</strong>
             </div>
         `;
     }
 }
 
-function checkPurchaseAvailability() {
-    const now = new Date();
-    const day = now.getDay();
-    const hour = now.getHours();
-    
-    let available = false;
-    let message = '';
-    
-    if (day === 0) { // Sunday
-        if (hour >= PURCHASE_START) available = true;
-        else message = `Tickets available from Saturday ${PURCHASE_START}:00 AM`;
-    } else if (day === 1 || day === 2 || day === 3 || day === 4) { // Mon-Thu
-        available = true;
-    } else if (day === 5) { // Friday
-        if (hour < PURCHASE_END) available = true;
-        else message = 'Tickets closed for today. Next purchase window: Saturday 10:00 AM';
-    } else if (day === 6) { // Saturday
-        if (hour >= PURCHASE_START) available = true;
-        else message = `Tickets available from ${PURCHASE_START}:00 AM`;
-    }
-    
-    const purchaseBtn = document.getElementById('purchase-btn');
-    if (purchaseBtn) {
-        purchaseBtn.disabled = !available;
-        if (!available) {
-            purchaseBtn.textContent = `⏰ ${message || 'Currently unavailable'}`;
-        } else {
-            purchaseBtn.textContent = '🎟️ Purchase Tickets';
-        }
-    }
-    
-    // Update every minute
-    setTimeout(checkPurchaseAvailability, 60000);
-}
-
-function generateUniqueTicketNumber() {
-    const tickets = JSON.parse(localStorage.getItem('tickets') || '[]');
-    let ticketNumber;
-    let exists = true;
-    
-    while (exists) {
-        // Generate random 10-digit number
-        ticketNumber = Math.floor(Math.random() * 9000000000) + 1000000000;
-        
-        // Check if it already exists
-        exists = tickets.some(t => t.ticketNumber === ticketNumber);
-    }
-    
-    return ticketNumber;
-}
-
 function purchaseTickets() {
     if (!selectedLottery) {
-        alert('Please select a lottery');
+        showWarning('⚠️ No Lottery Selected', 'Please select a lottery first');
         return;
     }
-    
+
     const paymentMethod = document.querySelector('input[name="payment-method"]:checked');
     if (!paymentMethod) {
-        alert('Please select a payment method');
+        showError('❌ Payment Method Required', 'Please select a payment method');
         return;
     }
-    
+
     const user = getCurrentUser();
     if (!user) {
-        window.location.href = 'login.html';
+        showError('❌ Not Logged In', 'Please login first');
         return;
     }
-    
-    // Generate tickets with unique numbers
+
+    // Generate tickets
     const newTickets = [];
     for (let i = 0; i < ticketQuantity; i++) {
-        const ticket = {
+        newTickets.push({
             id: Date.now() + i,
             userId: user.id,
-            username: user.username,
-            ticketNumber: generateUniqueTicketNumber(),
-            lottery: selectedLottery.type,
             lotteryName: selectedLottery.name,
-            price: TICKET_PRICE,
-            purchaseDate: new Date().toLocaleDateString('en-US'),
-            purchaseTime: new Date().toLocaleTimeString('en-US'),
+            ticketNumber: Math.floor(Math.random() * 9000000000) + 1000000000,
             drawDate: selectedLottery.date,
-            drawDay: DRAW_DAY,
-            drawTime: DRAW_TIME,
-            status: 'pending', // pending, won, lost
-            prizeWon: null,
             paymentMethod: paymentMethod.value,
-            transactionId: `TXN${Date.now()}${Math.random().toString(36).substr(2, 9).toUpperCase()}`
-        };
-        newTickets.push(ticket);
+            price: TICKET_PRICE,
+            status: 'pending',
+            purchaseDate: new Date().toLocaleDateString(),
+            purchaseTime: new Date().toLocaleTimeString()
+        });
     }
-    
-    // Save tickets to localStorage
+
+    // Save tickets
     const tickets = JSON.parse(localStorage.getItem('tickets') || '[]');
     tickets.push(...newTickets);
     localStorage.setItem('tickets', JSON.stringify(tickets));
-    
-    // Update user's wallet/balance (mock)
-    const users = JSON.parse(localStorage.getItem('users') || '[]');
-    const userIndex = users.findIndex(u => u.id === user.id);
-    if (userIndex !== -1) {
-        if (!users[userIndex].spent) users[userIndex].spent = 0;
-        users[userIndex].spent += TICKET_PRICE * ticketQuantity;
-        localStorage.setItem('users', JSON.stringify(users));
-    }
-    
-    // Show success modal
-    showPurchaseSuccessModal(newTickets);
-    
+
+    // Show purchase confirmation popup
+    showPurchaseConfirmation(newTickets[0], ticketQuantity);
+
     // Reset form
-    ticketQuantity = 1;
-    selectedLottery = null;
+    setTimeout(() => {
+        ticketQuantity = 1;
+        selectedLottery = null;
+        document.querySelectorAll('.lottery-type-card').forEach((c) => {
+            c.style.borderColor = 'transparent';
+            c.style.backgroundColor = 'transparent';
+        });
+        const quantitySection = document.getElementById('ticket-quantity-section');
+        if (quantitySection) {
+            quantitySection.style.display = 'none';
+        }
+        updateOrderSummary();
+    }, 5000);
 }
 
-function showPurchaseSuccessModal(tickets) {
-    const successModal = document.getElementById('success-modal');
-    if (!successModal) {
-        console.error('Success modal not found');
-        return;
-    }
+function showPurchaseConfirmation(ticket, quantity) {
+    const paymentMethod = document.querySelector('input[name="payment-method"]:checked').value;
+    const totalAmount = TICKET_PRICE * quantity;
     
-    const ticketsList = tickets.map(t => `
-        <div class="ticket-receipt" style="margin: 10px 0; padding: 10px; background: var(--bg-secondary); border-radius: 8px; border-left: 3px solid var(--primary-color);">
-            <div style="font-size: 0.9rem; color: var(--text-secondary);">Ticket #${t.ticketNumber}</div>
-            <div style="font-weight: 600; color: var(--primary-color);">🎟️ ${t.lotteryName}</div>
-            <div style="font-size: 0.85rem; margin-top: 5px;">
-                <div>Purchase: ${t.purchaseDate} ${t.purchaseTime}</div>
-                <div>Payment: ${t.paymentMethod.toUpperCase()}</div>
-                <div>Status: Pending Draw (${t.drawDate})</div>
-            </div>
-        </div>
-    `).join('');
+    // Create popup HTML
+    const popup = document.createElement('div');
+    popup.style.cssText = `
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.5);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 10000;
+        animation: fadeIn 0.3s ease;
+    `;
     
-    const modalContent = successModal.querySelector('.modal-content');
-    modalContent.innerHTML = `
-        <div style="text-align: center;">
-            <div style="font-size: 3rem; margin-bottom: 10px;">✅</div>
-            <h2 style="color: var(--success-color); margin-bottom: 15px;">Purchase Successful!</h2>
-            <p style="color: var(--text-secondary); margin-bottom: 20px;">
-                ${tickets.length} ticket${tickets.length > 1 ? 's' : ''} purchased for ${TICKET_PRICE * tickets.length} BDT
-            </p>
-            
-            <div style="text-align: left; max-height: 300px; overflow-y: auto; margin: 20px 0;">
-                ${ticketsList}
+    popup.innerHTML = `
+        <div style="background: var(--bg-secondary); border-radius: 16px; padding: 30px; max-width: 450px; width: 90%; box-shadow: 0 10px 40px rgba(0,0,0,0.3); animation: slideUp 0.3s ease;">
+            <div style="text-align: center; margin-bottom: 20px;">
+                <div style="font-size: 3rem; margin-bottom: 10px;">🎉</div>
+                <h2 style="margin: 0; color: var(--primary-color);">Purchase Successful!</h2>
+                <p style="margin: 5px 0; color: var(--text-secondary);">Your ticket has been confirmed</p>
             </div>
             
-            <div style="background: var(--gold-gradient); padding: 15px; border-radius: 8px; margin: 20px 0; color: white;">
-                <strong>📅 Draw Schedule:</strong>
-                <div>Every Friday at 8:00 PM</div>
-                <strong>💰 Prize Distribution:</strong>
-                <div>Within 24 hours of draw</div>
+            <div style="background: var(--bg-primary); padding: 20px; border-radius: 12px; margin: 20px 0; border-left: 4px solid var(--primary-color);">
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                    <div>
+                        <p style="margin: 0 0 5px 0; color: var(--text-secondary); font-size: 0.85rem;">Lottery Game</p>
+                        <p style="margin: 0; font-weight: 600; color: var(--primary-color);">${ticket.lotteryName}</p>
+                    </div>
+                    <div>
+                        <p style="margin: 0 0 5px 0; color: var(--text-secondary); font-size: 0.85rem;">Quantity</p>
+                        <p style="margin: 0; font-weight: 600;">${quantity} Ticket${quantity > 1 ? 's' : ''}</p>
+                    </div>
+                    <div>
+                        <p style="margin: 0 0 5px 0; color: var(--text-secondary); font-size: 0.85rem;">Draw Date</p>
+                        <p style="margin: 0; font-weight: 600;">${ticket.drawDate}</p>
+                    </div>
+                    <div>
+                        <p style="margin: 0 0 5px 0; color: var(--text-secondary); font-size: 0.85rem;">Total Cost</p>
+                        <p style="margin: 0; font-weight: 600; color: var(--success-color);">${totalAmount} BDT</p>
+                    </div>
+                    <div>
+                        <p style="margin: 0 0 5px 0; color: var(--text-secondary); font-size: 0.85rem;">Payment Method</p>
+                        <p style="margin: 0; font-weight: 600; text-transform: uppercase;">${paymentMethod}</p>
+                    </div>
+                    <div>
+                        <p style="margin: 0 0 5px 0; color: var(--text-secondary); font-size: 0.85rem;">Ticket ID</p>
+                        <p style="margin: 0; font-weight: 600; font-family: monospace; font-size: 0.9rem;">${ticket.ticketNumber}</p>
+                    </div>
+                </div>
             </div>
             
-            <div style="display: flex; gap: 10px; margin-top: 20px;">
-                <button onclick="closeSuccessModal()" class="btn-primary" style="flex: 1;">
-                    Check My Tickets
+            <div style="background: linear-gradient(135deg, #FFE082 0%, #FFB74D 100%); color: #333; padding: 15px; border-radius: 8px; text-align: center; margin-bottom: 20px; font-weight: 600;">
+                💡 Save your ticket! You'll need it to claim your prize.
+            </div>
+            
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+                <button onclick="this.closest('[style*=position]').remove()" style="padding: 12px; background: var(--bg-primary); color: var(--text-primary); border: 2px solid var(--primary-color); border-radius: 8px; cursor: pointer; font-weight: 600; transition: all 0.3s ease;">
+                    Close
                 </button>
-                <button onclick="buyMoreTickets()" class="btn-secondary" style="flex: 1;">
-                    Buy More
+                <button onclick="navigatePage('my-tickets'); this.closest('[style*=position]').remove();" style="padding: 12px; background: var(--primary-gradient); color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; transition: all 0.3s ease;">
+                    View My Tickets
                 </button>
             </div>
         </div>
     `;
     
-    successModal.style.display = 'flex';
+    // Add animations
+    const style = document.createElement('style');
+    style.textContent = `
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        @keyframes slideUp {
+            from { 
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to { 
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    `;
+    document.head.appendChild(style);
+    
+    document.body.appendChild(popup);
 }
 
-function closeSuccessModal() {
-    const successModal = document.getElementById('success-modal');
-    if (successModal) {
-        successModal.style.display = 'none';
-    }
-    // Redirect to dashboard
-    window.location.href = 'dashboard.html';
-}
-
-function buyMoreTickets() {
-    const successModal = document.getElementById('success-modal');
-    if (successModal) {
-        successModal.style.display = 'none';
-    }
-    // Reset the form and stay on page
-    document.querySelectorAll('.lottery-type-card').forEach(c => c.classList.remove('selected'));
-    selectedLottery = null;
-    ticketQuantity = 1;
-    const qtyInput = document.getElementById('ticket-quantity');
-    if (qtyInput) qtyInput.value = 1;
-}
-
-// Helper function
 function getCurrentUser() {
     const user = localStorage.getItem('currentUser');
     return user ? JSON.parse(user) : null;
 }
+

@@ -4,26 +4,100 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login - Supreme Lottery</title>
-    <link rel="stylesheet" href="../STYLES/style.css">
+    <link rel="stylesheet" href="STYLES/style.css">
+    <link rel="stylesheet" href="STYLES/spa-navigation.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
-    <button class="theme-toggle auth-theme-toggle" id="theme-toggle" title="Toggle Theme">
-        <span class="theme-icon">🌙</span>
-    </button>
-    <div class="auth-form-container">
-        <div class="auth-form-content">
-            <img src="../IMAGES/Supreme Lottery.png" alt="Supreme Lottery" class="auth-logo">
-            <h2>🔐 Welcome Back!</h2>
-            <p>Login to continue your winning streak</p>
-            <form id="login-form">
-                <input type="text" id="username" placeholder="Username or Email" required>
-                <input type="password" id="password" placeholder="Password" required>
-                <button type="submit" class="btn-primary">Login</button>
-            </form>
-            <p>Don't have an account? <a href="register.html">Register Now</a></p>
+    <!-- LOGIN PAGE -->
+    <div id="page-login" class="auth-page page-section active">
+        <button class="theme-toggle auth-theme-toggle" id="theme-toggle-login" title="Toggle Theme">
+            <span class="theme-icon">🌙</span>
+        </button>
+        <div class="auth-form-container">
+            <div class="auth-form-content">
+                <img src="IMAGES/Supreme Lottery.png" alt="Supreme Lottery" class="auth-logo">
+                <h2>🔐 Welcome Back!</h2>
+                <p>Login to continue your winning streak</p>
+                <form id="login-form">
+                    <input type="text" id="username" placeholder="Username or Email" required>
+                    <input type="password" id="password" placeholder="Password" required>
+                    <button type="submit" class="btn-primary">Login</button>
+                </form>
+                <p>Don't have an account? <a href="register.html" style="color: var(--primary-color); cursor: pointer;">Register Now</a></p>
+            </div>
         </div>
     </div>
-    <script src="../BACKEND/script.js"></script>
+
+    <!-- EXTERNAL SCRIPTS -->
+    <script src="BACKEND/beautiful-alerts.js"></script>
+
+    <script>
+        // PREVENT INFINITE REDIRECT LOOP
+        // Only load when HTML is fully parsed
+        window.addEventListener('load', () => {
+            // Check if already logged in
+            const currentUserData = localStorage.getItem('currentUser');
+            if (currentUserData) {
+                console.log('User already logged in, redirecting to index');
+                window.location.replace('index.html');
+                return;
+            }
+        });
+
+        // Login form handler
+        const loginForm = document.getElementById('login-form');
+        if (loginForm) {
+            loginForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const username = document.getElementById('username').value.trim();
+                const password = document.getElementById('password').value.trim();
+                
+                if (!username || !password) {
+                    showError('❌ Missing Fields', 'Please fill in all fields');
+                    return;
+                }
+                
+                // Get users from database
+                const users = JSON.parse(localStorage.getItem('users') || '[]');
+                
+                // Find user by username or email
+                const user = users.find(u => 
+                    (u.username === username || u.email === username) && u.password === password
+                );
+                
+                if (user) {
+                    // Save current user session
+                    localStorage.setItem('currentUser', JSON.stringify({
+                        id: user.id,
+                        name: user.name,
+                        email: user.email,
+                        username: user.username
+                    }));
+                    
+                    showSuccess('✅ Login Successful', 'Welcome back, ' + user.name + '!', 2000);
+                    
+                    // Redirect to home page after showing alert
+                    setTimeout(() => {
+                        window.location.replace('index.html');
+                    }, 2500);
+                } else {
+                    showError('❌ Login Failed', 'Invalid username or password');
+                }
+            });
+        }
+
+        // Initialize theme on page load
+        window.addEventListener('load', () => {
+            try {
+                const savedTheme = localStorage.getItem('theme') || 'light';
+                document.documentElement.setAttribute('data-theme', savedTheme);
+            } catch (error) {
+                console.error('Error initializing login page:', error);
+            }
+        });
+    </script>
 </body>
 </html>
