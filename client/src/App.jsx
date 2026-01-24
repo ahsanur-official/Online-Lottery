@@ -41,6 +41,8 @@ function App() {
   const [darkMode, setDarkMode] = useState(false)
   const [user, setUser] = useState(null)
   const [alerts, setAlerts] = useState([])
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
 
   // Load theme from localStorage
   useEffect(() => {
@@ -74,36 +76,111 @@ function App() {
     showAlert('success', '👋 Logged Out', 'You have been logged out successfully!', 2000)
   }
 
+  // Prevent background scroll when mobile sidebar is open
+  useEffect(() => {
+    if (mobileMenuOpen === 'sidebar') {
+      document.body.classList.add('no-scroll')
+    } else {
+      document.body.classList.remove('no-scroll')
+    }
+    return () => document.body.classList.remove('no-scroll')
+  }, [mobileMenuOpen])
+
   return (
-    <div className="app">
+    <div className={`app ${sidebarCollapsed ? 'collapsed' : ''}`}>
       {user ? (
         <div className="app-layout">
+          {/* Header */}
           <header className="header">
-            <div className="logo">
-              <img src="/IMAGES/Supreme Lottery.png" alt="Supreme Lottery" />
-              <h1 className="gradient-text">Supreme Lottery</h1>
+            <div className="header-left">
+              <button
+                className="sidebar-toggle"
+                onClick={() => {
+                  if (window.innerWidth <= 768) {
+                    setMobileMenuOpen(mobileMenuOpen === 'sidebar' ? false : 'sidebar')
+                  } else {
+                    setSidebarCollapsed(!sidebarCollapsed)
+                  }
+                }}
+                title={sidebarCollapsed ? 'Expand Sidebar' : 'Collapse Sidebar'}
+              >
+                <span></span>
+                <span></span>
+                <span></span>
+              </button>
             </div>
-            <nav className="nav">
-              <ul>
-                <li><a href="#" onClick={(e) => { e.preventDefault(); setCurrentPage('home') }} className={currentPage === 'home' ? 'nav-link active' : 'nav-link'}>Home</a></li>
-                <li><a href="#" onClick={(e) => { e.preventDefault(); setCurrentPage('dashboard') }} className={currentPage === 'dashboard' ? 'nav-link active' : 'nav-link'}>Dashboard</a></li>
-                <li><a href="#" onClick={(e) => { e.preventDefault(); setCurrentPage('buy-ticket') }} className={currentPage === 'buy-ticket' ? 'nav-link active' : 'nav-link'}>Buy Tickets</a></li>
-                <li><a href="#" onClick={(e) => { e.preventDefault(); setCurrentPage('my-tickets') }} className={currentPage === 'my-tickets' ? 'nav-link active' : 'nav-link'}>My Tickets</a></li>
-                <li><a href="#" onClick={(e) => { e.preventDefault(); setCurrentPage('results') }} className={currentPage === 'results' ? 'nav-link active' : 'nav-link'}>Results</a></li>
-              </ul>
-            </nav>
-            <button className="theme-toggle" onClick={toggleTheme} title="Toggle Theme">
-              <span className="theme-icon">{darkMode ? '☀️' : '🌙'}</span>
-            </button>
-            <div className="user-profile">
-              <div className="profile-icon">{user?.name?.charAt(0).toUpperCase() || 'U'}</div>
-              <div className="dropdown">
-                <a href="#" onClick={(e) => { e.preventDefault(); setCurrentPage('profile') }}>⚙️ Account Setup</a>
-                <a href="#" onClick={(e) => { e.preventDefault(); handleLogout() }}>🚪 Logout</a>
+
+            <div className="header-center">
+              <div className="logo">
+                <img src="/IMAGES/Supreme Lottery.png" alt="Supreme Lottery" />
+                <h1 className="gradient-text">Supreme Lottery</h1>
+              </div>
+            </div>
+
+            <div className="header-controls">
+              <button className="theme-toggle" onClick={toggleTheme} title="Toggle Theme">
+                <span className="theme-icon">{darkMode ? '☀️' : '🌙'}</span>
+              </button>
+              <div className="user-profile-dropdown">
+                <button className="profile-btn" onClick={() => setMobileMenuOpen(mobileMenuOpen === 'profile' ? false : 'profile')}>
+                  <div className="profile-icon">
+                    {user?.profilePic ? (
+                      <img src={user.profilePic} alt="Profile" className="profile-pic-image" />
+                    ) : (
+                      <span>{user?.name?.charAt(0).toUpperCase() || 'U'}</span>
+                    )}
+                  </div>
+                </button>
+                <div className={`profile-dropdown ${mobileMenuOpen === 'profile' ? 'open' : ''}`}>
+                  <a href="#" onClick={(e) => { e.preventDefault(); setCurrentPage('profile'); setMobileMenuOpen(false) }}>⚙️ Account Setup</a>
+                  <a href="#" onClick={(e) => { e.preventDefault(); handleLogout(); setMobileMenuOpen(false) }}>🚪 Logout</a>
+                </div>
               </div>
             </div>
           </header>
 
+          {/* Sidebar */}
+          <aside className={`sidebar ${mobileMenuOpen === 'sidebar' ? 'open' : ''} ${sidebarCollapsed ? 'collapsed' : ''}`}>
+            <nav className="sidebar-nav">
+              <ul>
+                <li>
+                  <a href="#" onClick={(e) => { e.preventDefault(); setCurrentPage('home'); setMobileMenuOpen(false) }} className={`nav-item ${currentPage === 'home' ? 'active' : ''}`}>
+                    <span className="nav-icon">🏠</span>
+                    <span className="nav-text">Home</span>
+                  </a>
+                </li>
+                <li>
+                  <a href="#" onClick={(e) => { e.preventDefault(); setCurrentPage('dashboard'); setMobileMenuOpen(false) }} className={`nav-item ${currentPage === 'dashboard' ? 'active' : ''}`}>
+                    <span className="nav-icon">📊</span>
+                    <span className="nav-text">Dashboard</span>
+                  </a>
+                </li>
+                <li>
+                  <a href="#" onClick={(e) => { e.preventDefault(); setCurrentPage('buy-ticket'); setMobileMenuOpen(false) }} className={`nav-item ${currentPage === 'buy-ticket' ? 'active' : ''}`}>
+                    <span className="nav-icon">🎫</span>
+                    <span className="nav-text">Buy Tickets</span>
+                  </a>
+                </li>
+                <li>
+                  <a href="#" onClick={(e) => { e.preventDefault(); setCurrentPage('my-tickets'); setMobileMenuOpen(false) }} className={`nav-item ${currentPage === 'my-tickets' ? 'active' : ''}`}>
+                    <span className="nav-icon">👤</span>
+                    <span className="nav-text">My Tickets</span>
+                  </a>
+                </li>
+                <li>
+                  <a href="#" onClick={(e) => { e.preventDefault(); setCurrentPage('results'); setMobileMenuOpen(false) }} className={`nav-item ${currentPage === 'results' ? 'active' : ''}`}>
+                    <span className="nav-icon">📈</span>
+                    <span className="nav-text">Results</span>
+                  </a>
+                </li>
+              </ul>
+            </nav>
+          </aside>
+
+          {/* Mobile backdrop when sidebar is open */}
+          <div className={`backdrop ${mobileMenuOpen === 'sidebar' ? 'open' : ''}`} onClick={() => setMobileMenuOpen(false)} />
+
+          {/* Main Content */}
           <main className="main-content">
             {currentPage === 'home' && <HomePage setCurrentPage={setCurrentPage} />}
             {currentPage === 'dashboard' && <DashboardPage />}
@@ -280,6 +357,7 @@ function HomePage({ setCurrentPage }) {
     <div className="main-container">
       <div className="hero-section">
         <div className="hero-content">
+          <img src="/IMAGES/Supreme Lottery.png" alt="Supreme Lottery" className="hero-logo" />
           <h1 className="hero-title">🎰 Welcome to Supreme Lottery</h1>
           <p className="hero-subtitle">Your chance to win big in Bangladesh!</p>
         </div>

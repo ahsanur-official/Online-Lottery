@@ -55,8 +55,11 @@ export function DashboardPage() {
   return (
     <div className="dashboard-container">
       <div className="dashboard-header">
-        <h1 className="page-title">Dashboard</h1>
-        <p className="welcome-text">Welcome back! Here's your lottery overview</p>
+        <img src="/IMAGES/Supreme Lottery.png" alt="Supreme Lottery" className="page-logo" />
+        <div>
+          <h1 className="page-title">Dashboard</h1>
+          <p className="welcome-text">Welcome back! Here's your lottery overview</p>
+        </div>
       </div>
 
       <section className="stats-section">
@@ -271,6 +274,7 @@ export function BuyTicketPage({ user, showAlert }) {
   return (
     <div className="buy-ticket-container">
       <div className="page-header">
+        <img src="/IMAGES/Supreme Lottery.png" alt="Supreme Lottery" className="page-logo" />
         <h1 className="page-title">🎫 Buy Lottery Tickets</h1>
       </div>
 
@@ -392,8 +396,13 @@ export function MyTicketsPage() {
 
   return (
     <div className="dashboard-container">
-      <h1 className="page-title">🎟️ My Tickets</h1>
-      <p className="welcome-text">Your purchased lottery tickets</p>
+      <div className="page-header">
+        <img src="/IMAGES/Supreme Lottery.png" alt="Supreme Lottery" className="page-logo" />
+        <div>
+          <h1 className="page-title">🎟️ My Tickets</h1>
+          <p className="welcome-text">Your purchased lottery tickets</p>
+        </div>
+      </div>
 
       {userTickets.length > 0 ? (
         <>
@@ -491,8 +500,13 @@ export function ResultsPage() {
 
   return (
     <div className="dashboard-container">
-      <h1 className="page-title">📊 Latest Results</h1>
-      <p className="welcome-text">Check the winning numbers and winners</p>
+      <div className="page-header">
+        <img src="/IMAGES/Supreme Lottery.png" alt="Supreme Lottery" className="page-logo" />
+        <div>
+          <h1 className="page-title">📊 Latest Results</h1>
+          <p className="welcome-text">Check the winning numbers and winners</p>
+        </div>
+      </div>
 
       {results.length > 0 ? (
         <div style={{display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(350px, 1fr))', gap: '20px'}}>
@@ -531,6 +545,7 @@ export function ProfilePage({ user, setUser, showAlert }) {
   const [email, setEmail] = useState(user?.email || '')
   const [phone, setPhone] = useState('')
   const [address, setAddress] = useState('')
+  const [profilePic, setProfilePic] = useState('')
   const [currentPassword, setCurrentPassword] = useState('')
   const [newPassword, setNewPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
@@ -538,16 +553,51 @@ export function ProfilePage({ user, setUser, showAlert }) {
   const [smsNotif, setSmsNotif] = useState(false)
   const [promoNotif, setPromoNotif] = useState(true)
 
+  // Load profile data on mount
+  useEffect(() => {
+    const users = JSON.parse(localStorage.getItem('users') || '[]')
+    const currentUserData = users.find(u => u.id === user?.id)
+    if (currentUserData) {
+      setFullname(currentUserData.name || '')
+      setEmail(currentUserData.email || '')
+      setPhone(currentUserData.phone || '')
+      setAddress(currentUserData.address || '')
+      setProfilePic(currentUserData.profilePic || '')
+      if (currentUserData.preferences) {
+        setEmailNotif(currentUserData.preferences.emailNotif !== false)
+        setSmsNotif(currentUserData.preferences.smsNotif !== false)
+        setPromoNotif(currentUserData.preferences.promoNotif !== false)
+      }
+    }
+  }, [user?.id])
+
+  const handleProfilePicChange = (e) => {
+    const file = e.target.files[0]
+    if (file) {
+      const reader = new FileReader()
+      reader.onload = (event) => {
+        const base64String = event.target.result
+        setProfilePic(base64String)
+      }
+      reader.readAsDataURL(file)
+    }
+  }
+
   const handleSaveProfile = () => {
+    if (!fullname.trim()) {
+      showAlert('error', '❌ Incomplete Form', 'Full name is required!', 0)
+      return
+    }
+
     const users = JSON.parse(localStorage.getItem('users') || '[]')
     const userIndex = users.findIndex(u => u.id === user.id)
 
     if (userIndex === -1) return
 
-    users[userIndex] = { ...users[userIndex], name: fullname, email: email, phone, address }
+    users[userIndex] = { ...users[userIndex], name: fullname, email: email, phone, address, profilePic }
     localStorage.setItem('users', JSON.stringify(users))
-    localStorage.setItem('currentUser', JSON.stringify({ ...user, name: fullname, email: email }))
-    setUser({ ...user, name: fullname, email: email })
+    localStorage.setItem('currentUser', JSON.stringify({ ...user, name: fullname, email: email, profilePic }))
+    setUser({ ...user, name: fullname, email: email, profilePic })
     showAlert('success', '✅ Profile updated', 'Your profile has been saved successfully!', 2000)
   }
 
@@ -599,10 +649,31 @@ export function ProfilePage({ user, setUser, showAlert }) {
   return (
     <div className="profile-container">
       <div className="profile-header">
+        <img src="/IMAGES/Supreme Lottery.png" alt="Supreme Lottery" className="page-logo" />
         <h1 className="page-title">⚙️ Account Setup</h1>
       </div>
 
       <div className="profile-content">
+        <div className="profile-section">
+          <h2>Profile Picture</h2>
+          <div className="profile-pic-container">
+            <div className="profile-pic-display">
+              {profilePic ? (
+                <img src={profilePic} alt="Profile" className="profile-pic" />
+              ) : (
+                <img src="/IMAGES/Supreme Lottery.png" alt="Default Profile" className="profile-pic default" />
+              )}
+            </div>
+            <div className="profile-pic-upload">
+              <label className="upload-btn">
+                📷 Choose Photo
+                <input type="file" accept="image/*" onChange={handleProfilePicChange} style={{display: 'none'}} />
+              </label>
+              <p className="upload-info">JPG, PNG, GIF (Max 5MB)</p>
+            </div>
+          </div>
+        </div>
+
         <div className="profile-section">
           <h2>Personal Information</h2>
           <div className="profile-form">
