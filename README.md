@@ -1,315 +1,448 @@
-# 🎰 Golden Lottery BD - Bangladesh Lottery System
+# 🎰 Supreme Lottery - Complete React + Node.js Application
 
-> A complete, professional lottery ticketing system built for Bangladesh with unique 10-digit ticket numbers, 1 BDT pricing, 7 prize tiers, and Bangladesh payment methods.
+A fully functional lottery ticket management system built with **React 18**, **Vite**, **Node.js/Express**, and **localStorage** for data persistence.
 
-## ✨ Features
+## 📋 Features Overview
 
-### 🎫 Ticket System
-- ✅ **10-digit unique ticket numbers** - Auto-generated, no duplicates
-- ✅ **1 BDT per ticket** - Affordable pricing
-- ✅ **Bulk purchase** - Buy 1 to 100 tickets at once
-- ✅ **Multiple unique numbers** - Each ticket gets different 10-digit number
+### ✨ Complete Feature Set
+- 🔐 **User Authentication** - Registration, Login, and Session Management
+- 📊 **Dashboard** - View statistics, wins, spent amount, and ticket history
+- 🎫 **Ticket Purchase** - Select lottery type, pick 6 numbers from 1-49, choose payment method
+- 📝 **My Tickets** - View all purchased tickets with filtering (All/Current/Past)
+- 🏆 **Results** - Check lottery results and winners
+- ⚙️ **Profile Management** - Update personal info, change password, set preferences
+- 🌙 **Dark Mode** - Beautiful theme toggle with persistent storage
+- 📱 **Responsive Design** - Optimized for desktop, tablet, and mobile
+- 🎨 **Beautiful Alerts** - Success, error, warning, and info notifications
+- 💾 **Data Persistence** - All data stored in browser localStorage
 
-### 💰 Pricing & Rewards
-- ✅ **7 Prize Tiers** per draw:
-  - 🥇 10,000 BDT (1 winner)
-  - 🥈 5,000 BDT (1 winner)
-  - 🥉 1,000 BDT (5 winners)
-- ✅ **Total pool**: 22,000 BDT weekly
+## 🚀 Getting Started
 
-### 📅 Schedule
-- ✅ **Draw Day**: Every Friday
-- ✅ **Draw Time**: 8:00 PM (20:00)
-- ✅ **Prize Distribution**: Within 24 hours
-- ✅ **Purchase Window**: Saturday 10 AM - Friday 6 PM
+### Prerequisites
+- Node.js (v14+)
+- npm (v6+)
 
-### 💳 Payment Methods (Bangladesh)
-- ✅ **bKash** 📱 - Mobile banking
-- ✅ **Nagad** 📲 - Mobile money service
-- ✅ **Rocket** 🚀 - Dutch-Bangla Bank service
+### Installation & Setup
 
-### 📊 Ticket Management
-- ✅ **Complete History** - All tickets displayed
-- ✅ **Filter Views** - All / Current / Past tickets
-- ✅ **Detailed Info** - Number, date, status, prize
-- ✅ **Winner Display** - By username with prize amount
+1. **Clone or extract the project:**
+```bash
+cd Lottery
+```
 
-### 🎨 User Experience
-- ✅ **Dark/Light Mode** - Professional theme switcher with animations
-- ✅ **Responsive Design** - Mobile, tablet, desktop
-- ✅ **Smooth Animations** - Beautiful page transitions
-- ✅ **Real-time Validation** - Purchase window checks
+2. **Install dependencies:**
 
-## 🛠️ Technologies Used
+**Frontend:**
+```bash
+cd client
+npm install
+```
 
-- **HTML5** - Structure
-- **CSS3** - Advanced animations, glassmorphism, gradients
-- **JavaScript (Vanilla)** - Unique ticket generation, time validation
-- **LocalStorage** - Data persistence
-- **Google Fonts (Poppins)** - Typography
+**Backend:**
+```bash
+cd ../server
+npm install
+```
 
-## 📂 Project Structure
+3. **Initialize Sample Data (Optional but Recommended):**
+   - Open the app in browser at `http://localhost:3000`
+   - Open Browser Console (F12 or Ctrl+Shift+I)
+   - Paste and run:
+     ```javascript
+     initializeDefaultData()
+     ```
+   - Refresh the page
+
+## 🎯 Quick Start
+
+### Option 1: Start Both Servers (Recommended)
+
+**Terminal 1 - Frontend:**
+```bash
+cd client
+npm run dev
+```
+Opens at: http://localhost:3000
+
+**Terminal 2 - Backend:**
+```bash
+cd server
+node server.js
+```
+Runs at: http://localhost:5000
+
+### Option 2: Start Only Frontend
+```bash
+cd client
+npm run dev
+```
+The app works perfectly with just localStorage without the backend!
+
+## 🔑 Demo Credentials
+
+**After running `initializeDefaultData()` in console:**
+- **Username:** demo
+- **Password:** demo123
+
+**Or create your own:**
+1. Click "Register Now" on login page
+2. Fill in the form
+3. Click "Create Account"
+4. Auto-logged in on success!
+
+## 📖 User Workflows
+
+### 1. New User Registration
+```
+Login Page → "Register Now" → Fill Form → Validate → Create Account → Auto-Login
+```
+
+### 2. Buy Lottery Tickets
+```
+Home → "Buy Tickets" → Select Lottery → Pick 6 Numbers → Set Quantity → 
+Choose Payment → Review Order → Purchase → Get Receipt with Ticket Numbers
+```
+
+### 3. View My Tickets
+```
+Dashboard → "My Tickets" → Filter by Status (All/Current/Past) → 
+View Ticket Details including Status and Prizes
+```
+
+### 4. Check Results
+```
+Dashboard → "Results" → View Draw Information and Winners List
+```
+
+### 5. Update Profile
+```
+Profile Icon → "Account Setup" → Update Personal Info / Change Password / 
+Set Preferences → Save Changes
+```
+
+## 📁 Project Structure
 
 ```
 Lottery/
-├── HTML/
-│   ├── index.html              # Home page (BD branding)
-│   ├── buy-ticket.html         # Ticket purchase interface
-│   ├── dashboard.html          # User dashboard
-│   ├── profile.html            # Account management
-│   ├── login.html              # Login page
-│   └── register.html           # Registration
-├── STYLES/
-│   └── style.css               # Animations & styling (1400+ lines)
-├── BACKEND/
-│   ├── script.js               # Core functionality
-│   ├── buy-ticket.js           # Unique ticket system (350+ lines)
-│   ├── dashboard.js            # Dashboard features (272 lines)
-│   └── profile.js              # Profile management
-└── DOCUMENTATION/
-    ├── README.md               # This file
-    ├── IMPLEMENTATION_SUMMARY.md
-    ├── BANGLADESH_LOTTERY_SYSTEM.md
-    └── THEME_SWITCHER_GUIDE.md
+├── client/
+│   ├── src/
+│   │   ├── App.jsx              # Main application component
+│   │   ├── App.css              # All styles (animations, dark mode, responsive)
+│   │   ├── pages.jsx            # All page components
+│   │   ├── main.jsx             # React entry point
+│   │   └── styles/
+│   │       └── index.css        # Global styles
+│   ├── index.html               # HTML template
+│   ├── package.json             # Frontend dependencies
+│   └── vite.config.js           # Vite configuration with API proxy
+├── server/
+│   ├── server.js                # Express backend
+│   └── package.json             # Backend dependencies
+├── IMAGES/                      # Logo images (unchanged)
+├── DATA_INITIALIZATION.js       # localStorage setup script
+├── IMPLEMENTATION_CHECKLIST.md  # Complete feature checklist
+└── README.md                    # This file
 ```
 
-## 🚀 Quick Start
+## 💾 Data Storage (localStorage)
 
-### 1. Open Website
-```
-Open: HTML/index.html in browser
-```
+The app persists data in 6 localStorage keys:
 
-### 2. Register
-- Click "Register Now"
-- Enter name, email, password
-- Account created instantly
+| Key | Contents | Structure |
+|-----|----------|-----------|
+| `users` | Registered users | Array of user objects |
+| `currentUser` | Logged-in user session | User object |
+| `tickets` | All purchased tickets | Array of ticket objects |
+| `draws` | Available lotteries | Array of lottery types |
+| `results` | Past lottery results | Array of draw results |
+| `updates` | News/announcements | Array of update objects |
+| `theme` | Dark/Light mode | 'light' or 'dark' |
 
-### 3. Buy Tickets
-- Click "Buy Tickets"
-- Select lottery game
-- Choose quantity (1-100)
-- Pick payment method
-- Confirm purchase
-- Get unique ticket numbers
+## 🎨 UI Components
 
-### 4. Check Dashboard
-- View all your tickets
-- See ticket history with filters
-- Check recent winners
-- Track winnings
+### Pages (6 Total)
+1. **Home** - Welcome page with lottery overview and results
+2. **Dashboard** - Statistics and ticket history
+3. **Buy Tickets** - Lottery ticket purchase workflow
+4. **My Tickets** - View purchased tickets with filters
+5. **Results** - Lottery draw results and winners
+6. **Profile** - Account settings and preferences
 
-## 💡 Key Numbers
+### Reusable UI Elements
+- Alert System (Success/Error/Warning/Info)
+- Navigation Bar with Logo and Menu
+- User Profile Dropdown
+- Theme Toggle Switch
+- Number Picker Grid (1-49)
+- Quantity Counter (±/input)
+- Status Badges
+- Payment Method Selector
+- Responsive Grid Layouts
 
-| Item | Value |
-|------|-------|
-| Ticket Price | 1 BDT |
-| Min Purchase | 1 ticket |
-| Max Purchase | 100 tickets |
-| Prize Pool | 22,000 BDT/week |
-| Total Winners | 7 per draw |
-| Ticket Format | 10-digit unique |
-| Draw Day | Friday |
-| Draw Time | 8:00 PM |
-| Prize Distribution | 24 hours |
+## 🎨 Styling Features
 
-## 🏆 Prize System
-
-Every Friday 8 PM draw awards:
-
-```
-🥇 MEGA PRIZE     10,000 BDT → 1 winner
-🥈 MAJOR PRIZE     5,000 BDT → 1 winner  
-🥉 MINI PRIZES     1,000 BDT → 5 winners
-                  ─────────────
-                  22,000 BDT total
-```
-
-**Winners announced by username** (e.g., @lucky_one won 10,000 BDT)
-
-## 📱 Payment Methods
-
-### bKash (📱)
-- Mobile banking service
-- Easy deposit/withdrawal
-- Instant transactions
-
-### Nagad (📲)
-- Mobile money platform
-- Wide merchant network
-- Secure payments
-
-### Rocket (🚀)
-- Dutch-Bangla Bank service
-- Bank-backed security
-- Reliable transfers
-
-## 🕒 Purchase Schedule
-
-### When Can You Buy?
-
-```
-📅 SATURDAY: 10:00 AM onwards
-📅 SUNDAY: All day (10 AM - Midnight)
-📅 MONDAY: All day (10 AM - Midnight)
-📅 TUESDAY: All day (10 AM - Midnight)
-📅 WEDNESDAY: All day (10 AM - Midnight)
-📅 THURSDAY: All day (10 AM - Midnight)
-📅 FRIDAY: Until 6:00 PM
-
-🔴 CLOSED: Friday 6 PM - Saturday 10 AM
-```
-
-## 🎯 Unique Ticket Generation
-
-### How It Works
-
-```javascript
-// Each ticket gets unique 10-digit number
-// Range: 1,000,000,000 to 9,999,999,999
-
-// Example Purchase:
-User buys 3 tickets
-  ↓
-System generates:
-  • 5834729165
-  • 9274618354
-  • 1928374651
-  ↓
-All stored in localStorage
-All unique (no duplicates possible)
-```
-
-## 📊 Dashboard Features
-
-### Statistics
-- Total tickets bought
-- Total wins
-- Total spent (BDT)
-- Total won (BDT)
-- Pending draws
-
-### Ticket History Tabs
-- **All** - Complete history
-- **Current** - Pending draws
-- **Past** - Completed draws
-
-### Each Ticket Shows
-- 10-digit unique number
-- Lottery name
-- Purchase date & time
-- Draw date & time
-- Status (pending/won/lost)
-- Prize amount (if won)
-- Payment method
-
-### Recent Winners
-- Username of winner
-- Prize amount
-- Draw date & time
-- Multiple winners per draw
-
-## 💾 Data Storage
-
-All data persists in localStorage:
-- **users** - User accounts and profiles
-- **currentUser** - Active session
-- **tickets** - All purchased tickets (with unique numbers)
-- **draws** - Upcoming Friday 8 PM draws
-- **results** - Past draw results and winners
-- **updates** - Announcements
-- **theme** - Dark/light mode preference
-
-## 🎨 Design & Aesthetics
-
-### Color Scheme
-- Primary: Purple gradient (#667eea → #764ba2)
-- Secondary: Pink gradient (#f093fb → #f5576c)
-- Gold accents (#ffd89b)
-- Bangladesh theme with national colors
+### Design System
+- **Colors:** Primary (purple), Secondary, Success, Error, Warning
+- **Typography:** Clear hierarchy with 3 font sizes
+- **Spacing:** Consistent padding/margin using CSS variables
+- **Shadows:** Subtle shadows for depth
 
 ### Animations
-- Theme toggle 3D spin effect
-- Page blur transitions
-- Icon float animations
-- Glassmorphism effects
-- Smooth color transitions
-- Professional hover states
+- Fade-in on page load
+- Slide-in header
+- Hover effects on buttons
+- Scale transforms on interactive elements
+- Smooth transitions throughout
+- Theme toggle animation
 
-### Responsive Design
-- Desktop (1024px+): Full features
-- Tablet (768px-1024px): Optimized layout
-- Mobile (<768px): Touch-friendly
-- Small mobile (<480px): Compact view
+### Responsive Breakpoints
+- **Desktop:** 1200px+
+- **Tablet:** 768px - 1199px
+- **Mobile:** < 768px
 
-## 🔐 Security Features
+## 🔐 Authentication
 
-- ✅ Unique tickets - No duplicates possible
-- ✅ User isolation - Only see your tickets
-- ✅ Time validation - Purchase window enforced
-- ✅ Transaction tracking - Every purchase logged
-- ✅ LocalStorage - Data secured locally
-- ✅ Password confirmation - On registration
-- ✅ Session management - Persistent login
+### User Registration
+```javascript
+// Validation Rules
+✓ Password: Minimum 6 characters
+✓ Confirm Password: Must match new password
+✓ Email: Must be unique (no duplicates)
+✓ Username: Can be any string
+```
 
-## 📱 Pages
+### User Login
+```javascript
+// Login attempts
+✓ Find user by username OR email
+✓ Match password exactly
+✓ Create session in currentUser
+✓ Persist across page refresh
+```
 
-1. **index.html** - Landing page with BD branding
-2. **buy-ticket.html** - Ticket purchase interface
-3. **dashboard.html** - Ticket history and winners
-4. **profile.html** - Account settings
-5. **login.html** - User login
-6. **register.html** - New account creation
+### Logout
+```javascript
+// Logout removes
+✗ currentUser from localStorage
+✗ User state from React
+→ Redirect to login page
+```
 
-## 🌟 Implemented Features
+## 💳 Ticket Purchase System
 
-✅ Unique 10-digit ticket numbers  
-✅ 1 BDT ticket pricing  
-✅ Multiple ticket purchase (1-100)  
-✅ 7 prize tiers (10K, 5K, 1K×5)  
-✅ bKash, Nagad, Rocket payment  
-✅ Friday 8 PM draws  
-✅ Saturday 10 AM - Friday 6 PM purchase window  
-✅ Winner announcement by username  
-✅ Complete ticket history with filtering  
-✅ Real-time purchase validation  
-✅ Transaction tracking  
-✅ Prize distribution info  
-✅ Professional UI/UX  
-✅ Dark/Light modes  
-✅ Responsive design  
-✅ Smooth animations  
+### Workflow
+1. Select lottery type (4 available)
+2. Pick exactly 6 numbers from 1-49
+3. Set quantity (1-100 tickets)
+4. Choose payment method (bKash/Nagad/Rocket)
+5. Review order summary
+6. Purchase generates unique ticket numbers
+7. Receipt shown with all details
 
-## 📚 Documentation
+### Ticket Properties
+```javascript
+{
+  id: Date.now(),                        // Unique ID
+  userId: currentUser.id,                // Owner reference
+  username: currentUser.username,        // Owner name
+  ticketNumber: 10_digit_random,        // Unique ticket #
+  lottery: 'mega' | 'power' | etc,      // Lottery type
+  price: 1,                              // Cost in BDT
+  purchaseDate: 'MM/DD/YYYY',           // When purchased
+  status: 'pending' | 'won' | 'lost',   // Current status
+  prizeWon: number | null,               // Prize amount
+  paymentMethod: 'bkash' | 'nagad' | 'rocket',
+  transactionId: 'TXN' + timestamp      // Transaction reference
+}
+```
 
-- [IMPLEMENTATION_SUMMARY.md](IMPLEMENTATION_SUMMARY.md) - Complete verification checklist
-- [BANGLADESH_LOTTERY_SYSTEM.md](BANGLADESH_LOTTERY_SYSTEM.md) - Technical system guide
-- [THEME_SWITCHER_GUIDE.md](THEME_SWITCHER_GUIDE.md) - Dark mode documentation
+## 📊 Statistics Calculation
 
-## 📝 Important Information
+### Dashboard Metrics
+```javascript
+totalTickets        = All tickets owned by user
+totalWins          = Tickets with status === 'won'
+totalSpent         = Total tickets × 1 BDT each
+totalWinnings      = Sum of all prizeWon amounts
+pendingDraws       = Tickets with status === 'pending'
+```
 
-- **Currency**: Bangladeshi Taka (BDT) 🇧🇩
-- **Draw Schedule**: Every Friday 8 PM
-- **Next Draw**: Check home page for exact time
-- **Prize Distribution**: Within 24 hours of draw
-- **Tickets Valid Until**: Draw time on Friday
-- **Support**: In-app notifications
+## ⚠️ Form Validation
 
-## 🎉 Ready to Play?
+### Registration/Login
+- ✓ Email must be unique
+- ✓ Email must not be empty
+- ✓ Password must be ≥ 6 characters
+- ✓ Confirm password must match
+- ✓ Username must not be empty
 
-1. Open `HTML/index.html`
-2. Register new account
-3. Buy lottery tickets
-4. Check dashboard
-5. Win amazing prizes!
+### Profile Update
+- ✓ Current password must match
+- ✓ New password must be ≥ 6 characters
+- ✓ Confirm password must match
+
+### Ticket Purchase
+- ✓ Lottery must be selected
+- ✓ Must pick exactly 6 numbers
+- ✓ Quantity must be 1-100
+
+## 🎯 Console Commands
+
+### Initialize Data
+```javascript
+initializeDefaultData()     // Setup all sample data
+viewAllData()              // Display all stored data
+addSampleWonTicket()       // Add a winning ticket
+clearAllData()             // Remove all app data
+quickStart()               // Show help guide
+```
+
+## 🌙 Dark Mode
+
+### How It Works
+1. Click moon/sun icon in header
+2. CSS classes toggle on `<body>`
+3. All colors automatically update
+4. Theme preference saved to localStorage
+5. Persists across browser sessions
+
+### CSS Variables Used
+```css
+--primary-color
+--bg-primary
+--bg-secondary
+--text-primary
+--text-secondary
+--success-color
+--error-color
+--warning-color
+```
+
+## 📱 Mobile Optimization
+
+- Touch-friendly button sizes (44px minimum)
+- Single-column layouts on mobile
+- Flexible grids that stack
+- Optimized number picker for small screens
+- Mobile-friendly forms
+- Portrait and landscape support
+
+## 🧪 Testing the App
+
+### Test Scenarios
+1. **Registration**
+   - Create new account
+   - Verify duplicate email rejected
+   - Check weak password warning
+
+2. **Login**
+   - Login with correct credentials
+   - Test wrong password error
+   - Verify session persists
+
+3. **Buy Tickets**
+   - Select each lottery type
+   - Purchase single and multiple tickets
+   - Verify receipt displays all tickets
+
+4. **My Tickets**
+   - View all tickets
+   - Filter by status
+   - Verify counts update
+
+5. **Profile**
+   - Update personal info
+   - Change password
+   - Toggle preferences
+
+6. **Dark Mode**
+   - Toggle theme multiple times
+   - Refresh page - theme persists
+   - Check all pages in both themes
+
+## 🐛 Troubleshooting
+
+### App won't start
+```bash
+# Clear node_modules and reinstall
+rm -rf node_modules package-lock.json
+npm install
+npm run dev
+```
+
+### Port 3000 already in use
+```bash
+# Kill process on port 3000
+# Windows: taskkill /PID <pid> /F
+# Mac/Linux: lsof -i :3000 | kill -9
+```
+
+### localStorage not persisting
+- Check browser allows cookies/storage
+- Try incognito/private window
+- Check browser storage settings
+
+### Tickets not showing
+- Run `initializeDefaultData()` in console
+- Check localStorage in DevTools (F12 → Application)
+- Verify tickets have correct userId
+
+## 📝 API Endpoints (Node.js Backend)
+
+| Method | Endpoint | Purpose |
+|--------|----------|---------|
+| POST | `/api/auth/register` | Register new user |
+| POST | `/api/auth/login` | Login user |
+| GET | `/api/draws` | Get all lotteries |
+| GET | `/api/tickets/:userId` | Get user's tickets |
+| GET | `/api/tickets` | Get all tickets |
+| POST | `/api/tickets/buy` | Purchase tickets |
+| GET | `/api/health` | Health check |
+
+## 🎓 Learning Resources
+
+### Technologies Used
+- **React** - UI library
+- **Vite** - Fast build tool
+- **Node.js** - Backend runtime
+- **Express** - Web framework
+- **CSS3** - Styling with animations
+- **localStorage** - Client-side storage
+
+### Key Concepts
+- React Hooks (useState, useEffect)
+- Component composition
+- State management
+- SPA (Single Page Application)
+- localStorage API
+- RESTful routing
+- Form validation
+- Responsive design
+
+## 📄 License
+
+Open source - feel free to use and modify!
+
+## 🙏 Credits
+
+Built with ❤️ for the Supreme Lottery platform.
 
 ---
 
-**Version**: 2.0 (Bangladesh Edition)  
-**Status**: ✅ Fully Implemented  
-**Last Updated**: 2025  
-**System**: Golden Lottery BD  
-**Location**: Bangladesh  
+## 📞 Support
 
-**Play Responsibly** ✨  
-*Golden Lottery BD - Your Luck Awaits!* 🎰
+For issues or questions:
+1. Check the IMPLEMENTATION_CHECKLIST.md
+2. Review DATA_INITIALIZATION.js for setup help
+3. Open browser console to use provided commands
+4. Verify localhost servers are running
+
+## 🎉 Enjoy!
+
+Welcome to **Supreme Lottery** - Your complete lottery ticket management system!
+
+**Happy Lottery! 🍀**
+
+---
+
+*Last Updated: January 2026*
+*Version: 1.0.0 (Production Ready)*
